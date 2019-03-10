@@ -5,7 +5,8 @@ RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 # Install prerequisites
 RUN apt-get update -qq && \
     apt-get install -y\
-      apt-transport-https \      software-properties-common\
+      apt-transport-https \      
+      software-properties-common\
       dirmngr\
       -y
 
