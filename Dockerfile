@@ -22,8 +22,9 @@ RUN AZ_REPO=$(lsb_release -cs)\
     
 RUN apt-key --keyring /etc/apt/trusted.gpg.d/Microsoft.gpg adv \
       --keyserver packages.microsoft.com \
-      --recv-keys BC528686B50D79E339D3721CEB3E94ADBE1229CF\
-    apt-get update -qq &&\
+      --recv-keys BC528686B50D79E339D3721CEB3E94ADBE1229CF
+    
+RUN apt-get update -qq &&\
     apt-get install -y azure-cli
 
 ENV EDITOR vim
