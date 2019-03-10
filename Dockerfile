@@ -11,10 +11,10 @@ RUN apt-get update -qq && \
       -y
 
 # Install Azure CLI
-RUN . /etc/os-release\
-    UBUNTU_CODENAME=$UBUNTU_CODENAME
+#RUN . /etc/os-release\
+#    UBUNTU_CODENAME=$UBUNTU_CODENAME
 
-RUN AZ_REPO=$(lsb_release -cs)\
+RUN . /etc/os-release &&\
     echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $UBUNTU_CODENAME main" | \
       tee /etc/apt/sources.list.d/azure-cli.list
     
