@@ -6,28 +6,24 @@ ENV AZURE_CLI_VERSION "0.10.13"
 ENV NODEJS_APT_ROOT "node_6.x"
 ENV NODEJS_VERSION "6.10.0"
 
+# Install prerequisites
 RUN apt-get update -qq && \
-    apt-get install -qqy --no-install-recommends\
+    apt-get install -y\
       apt-transport-https \
-      build-essential \
-      curl \
-      ca-certificates \
-      git \
       lsb-release \
-      python-all \
-      rlwrap \
-      vim \
-      nano \
-      jq && \
-    rm -rf /var/lib/apt/lists/* && \
-    curl https://deb.nodesource.com/${NODEJS_APT_ROOT}/pool/main/n/nodejs/nodejs_${NODEJS_VERSION}-1nodesource1~jessie1_amd64.deb > node.deb && \
-      dpkg -i node.deb && \
-      rm node.deb && \
-      npm install --global azure-cli@${AZURE_CLI_VERSION} && \
-      azure --completion >> ~/azure.completion.sh && \
-      echo 'source ~/azure.completion.sh' >> ~/.bashrc && \
-      azure
+      software-properties-common\
+      dirmngr\
+      -y
 
+# Install Azure CLI
+RUN AZ_REPO=$(lsb_release -cs)\
+    echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" | \
+      tee /etc/apt/sources.list.d/azure-cli.list\
+    apt-key --keyring /etc/apt/trusted.gpg.d/Microsoft.gpg adv \
+     --keyserver packages.microsoft.com \
+     --recv-keys BC528686B50D79E339D3721CEB3E94ADBE1229CF\
+    apt-get update -qq &&\
+    apt-get install -y azure-cli
 RUN azure config mode arm
 
 ENV EDITOR vim
