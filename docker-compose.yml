@@ -4,3 +4,7 @@ services:
     build: .
     stdin_open: true
     tty: true
+    volumes:
+    - D:\git:/code
+volumes:
+  code:

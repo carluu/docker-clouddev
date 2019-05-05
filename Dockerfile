@@ -37,7 +37,6 @@ RUN echo "source /etc/bash_completion.d/azure-cli" >> /root/.bashrc
 
 ############### End Install Azure CLI
 
-
 ############### Install AWS CLI
 
 # Install PIP
@@ -66,5 +65,9 @@ RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 RUN apt-get update && apt-get install -y google-cloud-sdk
 
 ############### Install GCP Cloud SDK
+
+############### Install Azure Python SDK for Python Dev
+RUN pip3 install azure
+############### End Install Azure Python SDK for Python Dev
 
 ENV EDITOR vim
