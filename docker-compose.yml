@@ -1,10 +1,10 @@
-version: '3'
+version: '3.5'
 services:
-  cli:
-    build: .
-    stdin_open: true
+  dev:
+    build: 
+        context: .
+        args:
+          AZURE_CLI_LOGIN_TENANT_ID: ${AZURE_CLI_LOGIN_TENANT_ID}
+          AZURE_CLI_LOGIN_SP_ID: ${AZURE_CLI_LOGIN_SP_ID}
+          AZURE_CLI_LOGIN_SP_SECRET: ${AZURE_CLI_LOGIN_SP_SECRET}
     tty: true
-    volumes:
-    - D:\git:/code
-volumes:
-  code:
