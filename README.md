@@ -14,12 +14,11 @@ A docker container to auto spin up:
 Features to add:
 * Configs for all cloud credentials
 
-
-Column 1 | Column 2 
---- | --- | ---
-Azure | Done 
-GCP | TODO 
-AWS | TODO
+| Cloud    |  Status  | 
+| -------- | -------- |
+| Azure    |  Done    |
+| GCP      |  TODO    |
+| AWS      |  TODO    |
 
 * Auto pulldown of ARM templates for Azure
 * Custom versions for tools
