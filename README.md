@@ -1,13 +1,16 @@
 # docker-cloudclis
 
 A docker container to auto spin up:
-- Git
-- Azure CLI
-- AWS CLI
-- GCP CLI
-- Azure Python SDK
-- Helm
-- Terraform (Version 0.12.23 as no out of box way to retrieve latest)
+
+| Tool             |  Default Version       | 
+| ---------------- | ---------------------- |
+| Git              |  Latest from apt       |
+| Azure CLI        |  Latest from apt       |
+| AWS CLI          |  Latest from pip       |
+| GCP CLI          |  Latest from apt       |
+| Azure Python SDK |  Latest from pip       |
+| Helm             |  Latest from helm site |
+| Terraform        |  0.12.23               |
 
 (Also installs all dependencies)
 
