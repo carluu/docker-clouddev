@@ -3,6 +3,8 @@ FROM ubuntu:latest
 ARG AZURE_CLI_LOGIN_TENANT_ID
 ARG AZURE_CLI_LOGIN_SP_ID
 ARG AZURE_CLI_LOGIN_SP_SECRET
+ARG GIT_USERNAME
+ARG GIT_USER_EMAIL
 
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
@@ -81,5 +83,9 @@ RUN echo 'export PATH=${HOME}/bin:${PATH}' >> ~/.bashrc
 
 # Log in to Azure
 RUN az login --service-principal --username $AZURE_CLI_LOGIN_SP_ID --password $AZURE_CLI_LOGIN_SP_SECRET --tenant $AZURE_CLI_LOGIN_TENANT_ID
+
+# Configure Git
+#RUN mkdir -p ${HOME}/git && cd ${HOME}/git && git init && git config –-global user.name $GIT_USERNAME && git config -–global user.email $GIT_USER_EMAIL
+RUN git config --global user.name $GIT_USERNAME && git config --global user.email $GIT_USER_EMAIL
 
 ENV EDITOR vim
