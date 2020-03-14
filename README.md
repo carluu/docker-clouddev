@@ -14,6 +14,7 @@ A docker container to auto spin up:
 Features to add:
 * Configs for all cloud credentials
 
+
 Column 1 | Column 2 
 --- | --- | ---
 Azure | Done 
