@@ -14,8 +14,8 @@ A docker container to auto spin up:
 
 (Also installs all dependencies)
 
-Features to add:
-* Configs for all cloud credentials
+##Other capabilities
+### Configs for all cloud credentials
 
 | Cloud    |  Status  | 
 | -------- | -------- |
@@ -23,18 +23,14 @@ Features to add:
 | GCP      |  TODO    |
 | AWS      |  TODO    |
 
-* Git configuration - sets user.name and user.email. Credentials are pulled from the VS Code credential helper, otherwise will need to handle credentials once in the container
+### Git configuration - sets user.name and user.email. Credentials are pulled from the VS Code credential helper, otherwise will need to handle credentials once in the container
 
-* Custom versions for tools
-
+## Instructions for use
 Set environment variabes by populating .env.sample and renaming to .env
 If using VS Code to develop in a container, will also need the .env in the root of the code folder
 
 Build using:
-docker-compose build dev
+`docker-compose build dev`
 
 Run using (Using -d for detached mode):
-docker-compose up -d dev
-
-Notes:
-- Currently mounts a volume for source code, configure to your use
+`docker-compose up -d dev`
