@@ -14,7 +14,7 @@ A docker container to auto spin up:
 
 (Also installs all dependencies)
 
-##Other capabilities
+## Other capabilities
 ### Configs for all cloud credentials
 
 | Cloud    |  Status  | 
@@ -23,7 +23,8 @@ A docker container to auto spin up:
 | GCP      |  TODO    |
 | AWS      |  TODO    |
 
-### Git configuration - sets user.name and user.email. Credentials are pulled from the VS Code credential helper, otherwise will need to handle credentials once in the container
+### Git configuration
+Sets user.name and user.email. Credentials are pulled from the VS Code credential helper, otherwise will need to handle credentials once in the container
 
 ## Instructions for use
 Set environment variabes by populating .env.sample and renaming to .env
