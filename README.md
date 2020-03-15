@@ -23,7 +23,8 @@ Features to add:
 | GCP      |  TODO    |
 | AWS      |  TODO    |
 
-* Auto pulldown of ARM templates for Azure
+* Git configuration - sets user.name and user.email. Credentials are pulled from the VS Code credential helper, otherwise will need to handle credentials once in the container
+
 * Custom versions for tools
 
 Set environment variabes by populating .env.sample and renaming to .env
