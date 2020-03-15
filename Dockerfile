@@ -7,9 +7,8 @@ ARG GIT_USERNAME
 ARG GIT_USER_EMAIL
 
 ARG AZURE_CLI_VERSION
-ARG AWS_CLI_VERSION
 ARG GCP_CLI_VERSION
-ARG AZURE_PYTHON_VERSION
+ARG AZURE_SDK_VERSION
 ARG HELM_VERSION
 ARG TERRAFORM_VERSION
 
@@ -26,7 +25,9 @@ RUN apt-get update -qq && \
       python3-distutils\
       curl\
       unzip\
-      git
+      git && \
+      curl -O https://bootstrap.pypa.io/get-pip.py && \
+      python3 get-pip.py 
 
 # Add Azure CLI source
 RUN . /etc/os-release &&\
@@ -53,14 +54,15 @@ RUN apt-get update -qq
 RUN if [ -z "$HELM_VERSION" ] ; then \
       curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 > install_helm.sh &&  /bin/sh install_helm.sh; \
     else \
-      curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 > install_helm.sh &&  /bin/sh install_helm.sh --version ${HELM_VERSION}; \
+      curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 > install_helm.sh &&  /bin/sh install_helm.sh --version v${HELM_VERSION}; \
     fi
 
 # Install the Azure CLI    
 RUN if [ -z "$AZURE_CLI_VERSION" ] ; then \
       apt-get install -y azure-cli; \
     else \
-      apt-get install -y azure-cli=$AZURE_CLI_VERSION-1~$UBUNTU_CODENAME; \
+      . /etc/os-release &&\
+        apt-get install -y azure-cli=$AZURE_CLI_VERSION-1~$UBUNTU_CODENAME; \
     fi
 
 # Source the auto complete script
@@ -70,12 +72,14 @@ RUN echo "source /etc/bash_completion.d/azure-cli" >> /root/.bashrc
 
 ############### Install AWS CLI
 
-# Install PIP and AWS CLI and set PATH
-RUN curl -O https://bootstrap.pypa.io/get-pip.py && \
-      python3 get-pip.py && \
-      pip3 install awscli --upgrade --user --no-warn-script-location && \
-      echo "export PATH=/root/.local/bin:$PATH" >> /root/.bashrc
-
+# Install PIP and AWS CLI and set PATH (Replace uncommente with commented if you want CLI v1)
+#RUN  pip3 install awscli --upgrade --user --no-warn-script-location && \
+#      echo "export PATH=/root/.local/bin:$PATH" >> /root/.bashrc
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip" && \
+       cd /tmp && \
+       unzip awscliv2.zip && \
+       rm /tmp/awscliv2.zip && \
+       /bin/sh ./aws/install
 ############### End Install AWS CLI
 
 
@@ -84,18 +88,26 @@ RUN curl -O https://bootstrap.pypa.io/get-pip.py && \
 RUN if [ -z "$GCP_CLI_VERSION" ] ; then \
       apt-get install -y google-cloud-sdk; \
     else \
-      apt-get install -y google-cloud-sdk=$GCP_CLI_VERSION-1~$UBUNTU_CODENAME; \
+      apt-get install -y google-cloud-sdk=$GCP_CLI_VERSION-0; \
     fi
 
 ############### End Install GCP Cloud SDK
 
 ############### Install Azure Python SDK for Python Dev
-RUN pip3 install azure
+RUN if [ -z "$AZURE_SDK_VERSION" ] ; then \
+      pip3 install azure; \
+    else \
+      pip3 install azure=$AZURE_SDK_VERSION; \
+    fi 
 ############### End Install Azure Python SDK for Python Dev
 
 ############### Install Terraform
-RUN curl https://releases.hashicorp.com/terraform/0.12.23/terraform_${TERRAFORM_VERSION}_linux_amd64.zip > /tmp/terraform.zip
-RUN mkdir -p ${HOME}/bin && cd ${HOME}/bin && unzip /tmp/terraform.zip && rm /tmp/terraform.zip &&  echo 'export PATH=${HOME}/bin:${PATH}' >> ~/.bashrc
+RUN curl https://releases.hashicorp.com/terraform/0.12.23/terraform_${TERRAFORM_VERSION}_linux_amd64.zip -o /tmp/terraform.zip && \
+      mkdir -p ${HOME}/bin && \
+       cd ${HOME}/bin && \
+       unzip /tmp/terraform.zip && \
+       rm /tmp/terraform.zip && \
+       echo 'export PATH=${HOME}/bin:${PATH}' >> ~/.bashrc
 ############### End Install Terraform
 
 # Log in to Azure

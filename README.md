@@ -2,15 +2,15 @@
 
 A docker container to auto spin up:
 
-| Tool             |  Default Version       | 
-| ---------------- | ---------------------- |
-| Git              |  Latest from apt       |
-| Azure CLI        |  Latest from apt       |
-| AWS CLI          |  Latest from pip       |
-| GCP CLI          |  Latest from apt       |
-| Azure Python SDK |  Latest from pip       |
-| Helm             |  Latest from helm site |
-| Terraform        |  0.12.23               |
+| Tool             |  Default Version (if blank) | Custom Version Support | Custom Version Example | Notes
+| ---------------- | --------------------------  | :--------------------: | :--------------------: | ----------- |
+| Git              |  Latest from apt            | No                     | N/A                    |             |
+| Azure CLI        |  Latest from apt            | Yes                    | 2.2.0                  |             |
+| AWS CLI          |  Latest from AWS site       | No (Possible?)         | N/A                    |               Using v2.x. For v1.x, need to edit dockerfile per instructions there |
+| GCP CLI          |  Latest from apt            | Yes                    | 284.0.0                |             |
+| Azure Python SDK |  Latest from pip            | TBD                    | 4.0.0                  |             |
+| Helm             |  Latest from helm site      | Yes                    | 3.1.2                  |             |
+| Terraform        |  0.12.23                    | Yes (Required)         | 0.12.23                |             |
 
 (Also installs all dependencies)
 
