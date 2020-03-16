@@ -11,6 +11,7 @@ ARG GCP_CLI_VERSION
 ARG AZURE_SDK_VERSION
 ARG HELM_VERSION
 ARG TERRAFORM_VERSION
+ARG KUBECTL_VERSION
 
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
@@ -29,26 +30,19 @@ RUN apt-get update -qq && \
       curl -O https://bootstrap.pypa.io/get-pip.py && \
       python3 get-pip.py 
 
-# Add Azure CLI source
+# Add Azure CLI/GCP/Kubectl source and package keys
 RUN . /etc/os-release &&\
       echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $UBUNTU_CODENAME main" | \
-            tee /etc/apt/sources.list.d/azure-cli.list
-
-# Add Azure CLI package keys    
-RUN apt-key --keyring /etc/apt/trusted.gpg.d/Microsoft.gpg adv \
+            tee /etc/apt/sources.list.d/azure-cli.list && \
+      apt-key --keyring /etc/apt/trusted.gpg.d/Microsoft.gpg adv \
       --keyserver packages.microsoft.com \
-      --recv-keys BC528686B50D79E339D3721CEB3E94ADBE1229CF
-
-# Add Google Cloud SDK source
-RUN . /etc/os-release &&\
+      --recv-keys BC528686B50D79E339D3721CEB3E94ADBE1229CF && \
       echo "deb http://packages.cloud.google.com/apt cloud-sdk-$UBUNTU_CODENAME main" | \
-            tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
-
-# Add Google Cloud SDK package keys
-RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
-
-# Run a final apt update before doing the rest
-RUN apt-get update -qq
+            tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
+      curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
+      echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list && \
+      curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
+      apt-get update -qq
 
 # Install helm by retrieving install script from git and executing
 RUN if [ -z "$HELM_VERSION" ] ; then \
@@ -109,6 +103,14 @@ RUN curl https://releases.hashicorp.com/terraform/0.12.23/terraform_${TERRAFORM_
        rm /tmp/terraform.zip && \
        echo 'export PATH=${HOME}/bin:${PATH}' >> ~/.bashrc
 ############### End Install Terraform
+
+# Install kubectl  by retrieving install script and executing
+RUN if [ -z "$KUBECTL_VERSION" ] ; then \
+      apt-get install -y kubectl; \
+    else \
+      apt-get install -y kubectl=$KUBECTL_VERSION-00; \
+    fi
+
 
 # Log in to Azure
 RUN az login --service-principal --username $AZURE_CLI_LOGIN_SP_ID --password $AZURE_CLI_LOGIN_SP_SECRET --tenant $AZURE_CLI_LOGIN_TENANT_ID
