@@ -31,8 +31,12 @@ Sets user.name and user.email. Credentials are pulled from the VS Code credentia
 Set environment variabes by populating .env.sample and renaming to .env
 If using VS Code to develop in a container, will also need the .env in the root of the code folder
 
+Currently has two docker compose options services:
+Filename: *docker-compose.yml*, Service Name *dev*: This is the full container with all tools
+Filename: *docker-compose-azure.yml*, Service Name *dev-azure*: This is a container with AWS and GCP tooling removed
+
 Build using:
-`docker-compose build dev`
+`docker-compose build -f <filename> <service name>`
 
 Run using (Using -d for detached mode):
-`docker-compose up -d dev`
+`docker-compose up -d <service name>`
