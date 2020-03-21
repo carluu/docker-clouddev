@@ -1,22 +1,9 @@
 FROM ubuntu:latest
 
-ARG AZURE_CLI_LOGIN_TENANT_ID
-ARG AZURE_CLI_LOGIN_SP_ID
-ARG AZURE_CLI_LOGIN_SP_SECRET
-ARG GIT_USERNAME
-ARG GIT_USER_EMAIL
-
-ARG AZURE_CLI_VERSION
-ARG GCP_CLI_VERSION
-ARG AZURE_SDK_VERSION
-ARG HELM_VERSION
-ARG TERRAFORM_VERSION
-ARG KUBECTL_VERSION
-
-RUN rm /bin/sh && ln -s /bin/bash /bin/sh
-
 # Install prerequisites
-RUN apt-get update -qq && \
+RUN rm /bin/sh && \
+    ln -s /bin/bash /bin/sh && \
+    apt-get update -qq && \
     apt-get install -y\
       apt-transport-https \      
       software-properties-common\
@@ -24,6 +11,7 @@ RUN apt-get update -qq && \
       python2.7\
       python3\
       python3-distutils\
+      python3-venv\
       curl\
       unzip\
       git && \
@@ -44,24 +32,15 @@ RUN . /etc/os-release &&\
       curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
       apt-get update -qq
 
-# Install helm by retrieving install script from git and executing
-RUN if [ -z "$HELM_VERSION" ] ; then \
-      curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 > install_helm.sh &&  /bin/sh install_helm.sh; \
-    else \
-      curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 > install_helm.sh &&  /bin/sh install_helm.sh --version v${HELM_VERSION}; \
-    fi
-
 # Install the Azure CLI    
+ARG AZURE_CLI_VERSION
 RUN if [ -z "$AZURE_CLI_VERSION" ] ; then \
       apt-get install -y azure-cli; \
     else \
       . /etc/os-release &&\
         apt-get install -y azure-cli=$AZURE_CLI_VERSION-1~$UBUNTU_CODENAME; \
-    fi
-
-# Source the auto complete script
-RUN echo "source /etc/bash_completion.d/azure-cli" >> /root/.bashrc
-
+    fi && \
+    echo "source /etc/bash_completion.d/azure-cli" >> /root/.bashrc
 ############### End Install Azure CLI
 
 ############### Install AWS CLI
@@ -78,7 +57,7 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/aws
 
 
 ############### Install GCP Cloud SDK           
-
+ARG GCP_CLI_VERSION
 RUN if [ -z "$GCP_CLI_VERSION" ] ; then \
       apt-get install -y google-cloud-sdk; \
     else \
@@ -88,6 +67,7 @@ RUN if [ -z "$GCP_CLI_VERSION" ] ; then \
 ############### End Install GCP Cloud SDK
 
 ############### Install Azure Python SDK for Python Dev
+ARG AZURE_SDK_VERSION
 RUN if [ -z "$AZURE_SDK_VERSION" ] ; then \
       pip3 install azure; \
     else \
@@ -96,6 +76,7 @@ RUN if [ -z "$AZURE_SDK_VERSION" ] ; then \
 ############### End Install Azure Python SDK for Python Dev
 
 ############### Install Terraform
+ARG TERRAFORM_VERSION
 RUN curl https://releases.hashicorp.com/terraform/0.12.23/terraform_${TERRAFORM_VERSION}_linux_amd64.zip -o /tmp/terraform.zip && \
       mkdir -p ${HOME}/bin && \
        cd ${HOME}/bin && \
@@ -104,18 +85,29 @@ RUN curl https://releases.hashicorp.com/terraform/0.12.23/terraform_${TERRAFORM_
        echo 'export PATH=${HOME}/bin:${PATH}' >> ~/.bashrc
 ############### End Install Terraform
 
+# Install helm by retrieving install script from git and executing
+ARG HELM_VERSION
+RUN if [ -z "$HELM_VERSION" ] ; then \
+      curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 > install_helm.sh &&  /bin/sh install_helm.sh; \
+    else \
+      curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 > install_helm.sh &&  /bin/sh install_helm.sh --version v${HELM_VERSION}; \
+    fi
+
 # Install kubectl  by retrieving install script and executing
+ARG KUBECTL_VERSION
 RUN if [ -z "$KUBECTL_VERSION" ] ; then \
       apt-get install -y kubectl; \
     else \
       apt-get install -y kubectl=$KUBECTL_VERSION-00; \
     fi
 
-
-# Log in to Azure
-RUN az login --service-principal --username $AZURE_CLI_LOGIN_SP_ID --password $AZURE_CLI_LOGIN_SP_SECRET --tenant $AZURE_CLI_LOGIN_TENANT_ID
-
-# Configure Git (VS Code handles the credentials assuming I've used them there)
-RUN git config --global user.name $GIT_USERNAME && git config --global user.email $GIT_USER_EMAIL
+# Log in to Azure and Git (VS Code handles the credentials assuming I've used them there)
+ARG AZURE_CLI_LOGIN_TENANT_ID
+ARG AZURE_CLI_LOGIN_SP_ID
+ARG AZURE_CLI_LOGIN_SP_SECRET
+ARG GIT_USERNAME
+ARG GIT_USER_EMAIL
+RUN az login --service-principal --username $AZURE_CLI_LOGIN_SP_ID --password $AZURE_CLI_LOGIN_SP_SECRET --tenant $AZURE_CLI_LOGIN_TENANT_ID && \
+      git config --global user.name $GIT_USERNAME && git config --global user.email $GIT_USER_EMAIL
 
 ENV EDITOR vim
