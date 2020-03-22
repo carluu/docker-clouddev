@@ -48,6 +48,7 @@ RUN if [ "$AZURE_CLI_VERSION" == "0" ] ; then \
 # Install PIP and AWS CLI and set PATH (Replace uncommente with commented if you want CLI v1)
 #RUN  pip3 install awscli --upgrade --user --no-warn-script-location && \
 #      echo "export PATH=/root/.local/bin:$PATH" >> /root/.bashrc
+ARG AWS_CLI_VERSION
 RUN if [ "$AWS_CLI_VERSION" == "0" ] ; then \
       exit 0; \
     fi && \
