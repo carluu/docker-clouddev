@@ -1,9 +1,9 @@
 FROM ubuntu:latest
 
-# Install prerequisites
+# Install prerequisites (apt get option addresses WSL clock issue as per: https://github.com/microsoft/WSL/issues/4114)
 RUN rm /bin/sh && \
     ln -s /bin/bash /bin/sh && \
-    apt-get update -qq && \
+    apt-get -o Acquire::Check-Valid-Until=false -o Acquire::Check-Date=false -qq  update&& \
     apt-get install -y\
       apt-transport-https \      
       software-properties-common\
@@ -21,26 +21,28 @@ RUN rm /bin/sh && \
 
 # Install the Azure CLI    
 ARG AZURE_CLI_VERSION
+ARG AZURE_CLI_LOGIN_SUBSCRIPTION_ID
 ARG AZURE_CLI_LOGIN_TENANT_ID
 ARG AZURE_CLI_LOGIN_SP_ID
 ARG AZURE_CLI_LOGIN_SP_SECRET
 RUN if [ "$AZURE_CLI_VERSION" == "0" ] ; then \
       exit 0; \
     fi && \
-    . /etc/os-release &&\
-      echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $UBUNTU_CODENAME main" | \
-            tee /etc/apt/sources.list.d/azure-cli.list && \
-      apt-key --keyring /etc/apt/trusted.gpg.d/Microsoft.gpg adv \
-      --keyserver packages.microsoft.com \
-      --recv-keys BC528686B50D79E339D3721CEB3E94ADBE1229CF && \
+      curl -sL https://packages.microsoft.com/keys/microsoft.asc | \
+        gpg --dearmor | \
+        tee /etc/apt/trusted.gpg.d/microsoft.asc.gpg > /dev/null && \
+      AZ_REPO=$(lsb_release -cs) && \
+        echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" | \
+          tee /etc/apt/sources.list.d/azure-cli.list && \
     if [ -z "$AZURE_CLI_VERSION" ] ; then \
-      apt-get update && apt-get install -y azure-cli; \
+      apt-get -o Acquire::Check-Valid-Until=false -o Acquire::Check-Date=false update && apt-get install -y azure-cli; \
     else \
       . /etc/os-release &&\
-        apt-get update && apt-get install -y azure-cli=$AZURE_CLI_VERSION-1~$UBUNTU_CODENAME; \
+        apt-get -o Acquire::Check-Valid-Until=false -o Acquire::Check-Date=false update && apt-get install -y azure-cli=$AZURE_CLI_VERSION-1~$UBUNTU_CODENAME; \
     fi && \
     echo "source /etc/bash_completion.d/azure-cli" >> /root/.bashrc && \
-    az login --service-principal --username $AZURE_CLI_LOGIN_SP_ID --password $AZURE_CLI_LOGIN_SP_SECRET --tenant $AZURE_CLI_LOGIN_TENANT_ID
+    az login --service-principal --username $AZURE_CLI_LOGIN_SP_ID --password $AZURE_CLI_LOGIN_SP_SECRET --tenant $AZURE_CLI_LOGIN_TENANT_ID && \
+    az account set -s $AZURE_CLI_LOGIN_SUBSCRIPTION_ID
 ############### End Install Azure CLI
 
 ############### Install AWS CLI
@@ -70,9 +72,9 @@ RUN if [ "$GCP_CLI_VERSION" == "0" ] ; then \
           tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \ 
     if [ -z "$GCP_CLI_VERSION" ] ; then \
-      apt-get update && apt-get install -y google-cloud-sdk; \
+      apt-get -o Acquire::Check-Valid-Until=false -o Acquire::Check-Date=false update && apt-get install -y google-cloud-sdk; \
     else \
-      apt-get update && apt-get install -y google-cloud-sdk=$GCP_CLI_VERSION-0; \
+      apt-get -o Acquire::Check-Valid-Until=false -o Acquire::Check-Date=false update && apt-get install -y google-cloud-sdk=$GCP_CLI_VERSION-0; \
     fi
 
 ############### End Install GCP Cloud SDK
@@ -94,12 +96,16 @@ ARG TERRAFORM_VERSION
 RUN if [ "$TERRAFORM_VERSION" == "0" ] ; then \
       exit 0; \
     fi && \
-    curl https://releases.hashicorp.com/terraform/0.12.23/terraform_${TERRAFORM_VERSION}_linux_amd64.zip -o /tmp/terraform.zip && \
+    curl https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip -o /tmp/terraform.zip && \
       mkdir -p ${HOME}/bin && \
        cd ${HOME}/bin && \
        unzip /tmp/terraform.zip && \
        rm /tmp/terraform.zip && \
-       echo 'export PATH=${HOME}/bin:${PATH}' >> ~/.bashrc
+       echo 'export PATH=${HOME}/bin:${PATH}' >> ~/.bashrc && \
+       echo "export ARM_SUBSCRIPTION_ID=${AZURE_CLI_LOGIN_SUBSCRIPTION_ID}" >> ~/.bashrc && \
+       echo "export ARM_TENANT_ID=${AZURE_CLI_LOGIN_TENANT_ID}" >> ~/.bashrc && \
+       echo "export ARM_CLIENT_ID=${AZURE_CLI_LOGIN_SP_ID}" >> ~/.bashrc && \
+       echo "export ARM_CLIENT_SECRET=${AZURE_CLI_LOGIN_SP_SECRET}" >> ~/.bashrc
 ############### End Install Terraform
 
 # Install helm by retrieving install script from git and executing
@@ -121,9 +127,9 @@ RUN if [ "$KUBECTL_VERSION" == "0" ] ; then \
     echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list && \
       curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \ 
     if [ -z "$KUBECTL_VERSION" ] ; then \
-      apt-get update && apt-get install -y kubectl; \
+      apt-get -o Acquire::Check-Valid-Until=false -o Acquire::Check-Date=false update && apt-get install -y kubectl; \
     else \
-      apt-get update && apt-get install -y kubectl=$KUBECTL_VERSION-00; \
+      apt-get -o Acquire::Check-Valid-Until=false -o Acquire::Check-Date=false update && apt-get install -y kubectl=$KUBECTL_VERSION-00; \
     fi
 
 # Log in to Azure and Git (VS Code handles the credentials assuming I've used them there)
@@ -141,9 +147,9 @@ RUN if [ "$AZURE_FUNCTIONS_TOOLS_VERSION" == "0" ] ; then \
       wget -q https://packages.microsoft.com/config/ubuntu/$VERSION_ID/packages-microsoft-prod.deb && \
       dpkg -i packages-microsoft-prod.deb && \ 
     if [ -z "$AZURE_FUNCTIONS_TOOLS_VERSION" ] ; then \
-      apt-get update && apt-get install -y azure-functions-core-tools-3; \
+      apt-get -o Acquire::Check-Valid-Until=false -o Acquire::Check-Date=false update && apt-get install -y azure-functions-core-tools-3; \
     else \
-      apt-get update && apt-get install -y azure-functions-core-tools-3=$AZURE_FUNCTIONS_TOOLS_VERSION-1; \
+      apt-get -o Acquire::Check-Valid-Until=false -o Acquire::Check-Date=false update && apt-get install -y azure-functions-core-tools-3=$AZURE_FUNCTIONS_TOOLS_VERSION-1; \
     fi
 
 ENV EDITOR vim

@@ -5,6 +5,7 @@ services:
         context: .
         dockerfile: Dockerfile
         args:
+          AZURE_CLI_LOGIN_SUBSCRIPTION_ID: ${AZURE_CLI_LOGIN_SUBSCRIPTION_ID}
           AZURE_CLI_LOGIN_TENANT_ID: ${AZURE_CLI_LOGIN_TENANT_ID}
           AZURE_CLI_LOGIN_SP_ID: ${AZURE_CLI_LOGIN_SP_ID}
           AZURE_CLI_LOGIN_SP_SECRET: ${AZURE_CLI_LOGIN_SP_SECRET}
