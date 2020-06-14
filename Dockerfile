@@ -1,10 +1,13 @@
 FROM ubuntu:latest
 
 # Install prerequisites (apt get option addresses WSL clock issue as per: https://github.com/microsoft/WSL/issues/4114)
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=America/New_York
 RUN rm /bin/sh && \
     ln -s /bin/bash /bin/sh && \
     apt-get -o Acquire::Check-Valid-Until=false -o Acquire::Check-Date=false -qq  update&& \
     apt-get install -y\
+      tzdata \
       apt-transport-https \      
       software-properties-common\
       dirmngr\

@@ -10,7 +10,7 @@ A docker container to auto spin up:
 | GCP CLI            |  Latest from apt            | Yes                    | 284.0.0                |             |
 | Azure Python SDK   |  Latest from pip            | TBD                    | 4.0.0                  |             |
 | Helm               |  Latest from helm site      | Yes                    | 3.1.2                  |             |
-| Terraform          |  0.12.24                   | Yes (Required)         | 0.12.23                |             |
+| Terraform          |  0.12.24                    | Yes (Required)         | 0.12.23                |             |
 | Kubectl            |  Latest from apt            | Yes                    | 1.17.4                 |             |
 | Az Functions Tools |  Latest from apt            | Yes                    | 3.0.2245               |             |
 
