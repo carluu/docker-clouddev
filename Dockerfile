@@ -22,7 +22,8 @@ RUN rm /bin/sh && \
       curl -O https://bootstrap.pypa.io/get-pip.py && \
       python3 get-pip.py 
 
-# Install the Azure CLI    
+# Install the Azure CLI  
+ARG FORCEREFRESH  
 ARG AZURE_CLI_VERSION
 ARG AZURE_CLI_LOGIN_SUBSCRIPTION_ID
 ARG AZURE_CLI_LOGIN_TENANT_ID
@@ -154,5 +155,15 @@ RUN if [ "$AZURE_FUNCTIONS_TOOLS_VERSION" == "0" ] ; then \
     else \
       apt-get -o Acquire::Check-Valid-Until=false -o Acquire::Check-Date=false update && apt-get install -y azure-functions-core-tools-3=$AZURE_FUNCTIONS_TOOLS_VERSION-1; \
     fi
+
+# Install Bicep
+ARG BICEP_VERSION
+RUN if [ "$BICEP_VERSION" == "0" ] ; then \
+      exit 0; \
+    fi && \
+    curl -Lo bicep https://github.com/Azure/bicep/releases/$BICEP_VERSION/download/bicep-linux-x64 && \
+    chmod +x ./bicep && \
+    mv ./bicep /usr/local/bin/bicep && \
+    echo $BICEP_VERSION
 
 ENV EDITOR vim
