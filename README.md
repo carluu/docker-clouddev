@@ -36,8 +36,6 @@ Sets user.name and user.email. Credentials are pulled from the VS Code credentia
 Set environment variabes by populating .env.sample and renaming to .env
 If using VS Code to develop in a container, will also need the .env in the root of the code folder
 
-Build using:
-`docker-compose build -f dev`
-
-Run using (Using -d for detached mode):
-`docker-compose up -d dev`
+1. Run the command Remote-Containers: Add Development Container Configuration Files
+2. Edit devcontainer.json  and change "dockerComposeFile": "docker-compose.yml" to "dockerComposeFile": "<insert path to docker-clouddev docker-compose.yml>". Also comment out remoteuser: vscode
+3. Run command: Remote-Containers: Reopen in Container

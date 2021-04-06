@@ -17,7 +17,7 @@ RUN rm /bin/sh && \
       python3-venv\
       curl\
       unzip\
-      wget\
+      wget \
       git && \
       curl -O https://bootstrap.pypa.io/get-pip.py && \
       python3 get-pip.py 

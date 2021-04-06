@@ -1,6 +1,6 @@
 version: '3.5'
 services:
-  dev:
+  app:
     build: 
         context: .
         dockerfile: Dockerfile
@@ -20,4 +20,16 @@ services:
           KUBECTL_VERSION: ${KUBECTL_VERSION}
           AZURE_FUNCTIONS_TOOLS_VERSION: ${AZURE_FUNCTIONS_TOOLS_VERSION}
           BICEP_VERSION: ${BICEP_VERSION}
+          USER_UID: 1000
+          USER_GID: 1000
     tty: true
+    init: true
+    volumes:
+      # Forwards the local Docker socket to the container.
+      - /var/run/docker.sock:/var/run/docker-host.sock 
+      # Update this to wherever you want VS Code to mount the folder of your project
+      - C:\\Code:/workspace:cached
+
+    # Overrides default command so things don't shut down after the process ends.
+    #entrypoint: /usr/local/share/docker-init.sh
+    #command: sleep infinity 
