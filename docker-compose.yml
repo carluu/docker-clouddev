@@ -1,6 +1,6 @@
 version: '3.5'
 services:
-  app:
+  dev:
     build: 
         context: .
         dockerfile: Dockerfile
@@ -21,7 +21,6 @@ services:
           AZURE_FUNCTIONS_TOOLS_VERSION: ${AZURE_FUNCTIONS_TOOLS_VERSION}
           BICEP_VERSION: ${BICEP_VERSION}
           FORCE_REFRESH: ${FORCEREFRESH}
-    tty: true
           USER_UID: 1000
           USER_GID: 1000
     tty: true
