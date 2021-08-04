@@ -46,7 +46,7 @@ RUN if [ "$AZURE_CLI_VERSION" == "0" ] ; then \
     fi && \
     echo "source /etc/bash_completion.d/azure-cli" >> /root/.bashrc && \
     az login --service-principal --username $AZURE_CLI_LOGIN_SP_ID --password $AZURE_CLI_LOGIN_SP_SECRET --tenant $AZURE_CLI_LOGIN_TENANT_ID && \
-    az account set -s $AZURE_CLI_LOGIN_SUBSCRIPTION_ID
+    az account set -s $AZURE_CLI_LOGIN_SUBSCRIPTION_ID 
 ############### End Install Azure CLI
 
 ############### Install AWS CLI
@@ -164,6 +164,7 @@ RUN if [ "$BICEP_VERSION" == "0" ] ; then \
     curl -Lo bicep https://github.com/Azure/bicep/releases/$BICEP_VERSION/download/bicep-linux-x64 && \
     chmod +x ./bicep && \
     mv ./bicep /usr/local/bin/bicep && \
-    echo $BICEP_VERSION
+    echo $BICEP_VERSION \
+    az bicep install
 
 ENV EDITOR vim
