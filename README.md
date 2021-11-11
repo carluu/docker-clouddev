@@ -1,5 +1,7 @@
 # docker-clouddev
 
+*Not maintaining anymore as VSCode has a number of native containers now*
+
 A docker container to auto spin up:
 
 | Tool               |  Default Version (if blank) | Custom Version Support | Custom Version Example | Notes
